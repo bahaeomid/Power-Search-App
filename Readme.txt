@@ -7,4 +7,4 @@ Once downloaded the app, make sure to change the working directory to your local
 
 You can also alter the web links being scraped by the app, from within the jobsearch.R file. 
 
-Please note that on average Power Search takes 5 minutes to run the first time.
+Please note that on average Power Search takes some time to run the first time.
