@@ -7,37 +7,10 @@ if(length(NewPackages)>0) install.packages(NewPackages)
 lapply(ListofPackages,require,character.only=TRUE)
 
 #Load source code
-source('C:/Users/Bahae.Omid/Desktop/PowerSearch App/jobsearch.R',local=TRUE)
+source('C:/Users/Bahae.Omid/Google Drive/My R Case Studies/Shiny Apps/PowerSearch App/jobsearch.R',local=TRUE)
 
 
 shinyServer(function(input,output){
-    
-    #Create a reactive function to generate the data for the 1st graph
-    p1 <- reactive({
-        t <- table(df$Location)
-        t <- t[t>10]
-        t <- t[order(t,decreasing = T)]
-        data.frame(City=names(t),Postings=t,row.names=NULL)
-        
-    })
-    
-    #Create a reactive function to generate the data for the 2nd graph
-    p2 <- reactive({
-      t <- table(df$Company)
-      t <- t[t>5]
-      t <- t[order(t,decreasing = T)]
-      data.frame(Company=names(t),Postings=t,row.names=NULL)
-      
-    })
-    
-    #Create a reactive function to generate the data for the 3rd graph
-    p3 <- reactive({
-      t <- table(df$Job)
-      t <- t[t>5]
-      t <- t[order(t,decreasing = T)]
-      data.frame(Job=names(t),Postings=t,row.names=NULL)
-      
-    })
     
     #Create a reactive function to deal with inputs of the Search tab
     search <- reactive({
@@ -49,9 +22,35 @@ shinyServer(function(input,output){
       else if(is.null(input$s)) {df <- df[0,]}
       df
     })
+    
+    #Create a reactive function to generate the data for the 1st graph
+    p1 <- reactive({
+      t <- table(search()$Location)
+      if(max(t)>10) {t <- t[t>10]} else {t <- t[t>1]}
+      t <- t[order(t,decreasing = T)]
+      data.frame(City=names(t),Postings=t,row.names=NULL)
+      
+    })
+    
+    #Create a reactive function to generate the data for the 2nd graph
+    p2 <- reactive({
+      t <- table(search()$Company)
+      if(max(t)>5) {t <- t[t>5]} else {t <- t[t>1]}
+      t <- t[order(t,decreasing = T)]
+      data.frame(Company=names(t),Postings=t,row.names=NULL)
+      
+    })
+    
+    #Create a reactive function to generate the data for the 3rd graph
+    p3 <- reactive({
+      t <- table(search()$Job)
+      if(max(t)>5) {t <- t[t>5]} else {t <- t[t>1]}
+      t <- t[order(t,decreasing = T)]
+      data.frame(Job=names(t),Postings=t,row.names=NULL)
+      
+    })
    
     #Send the 1st graph to ui.R
-    
     output$bp1 <- renderPlot({
         input$action1 #plot triggered only when button is pressed
         if(input$action1==0) return() 

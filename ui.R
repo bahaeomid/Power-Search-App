@@ -16,7 +16,9 @@ shinyUI(fluidPage(
                         
             #Add action buttons to plot the graphs. up to 3 graphs is permissible. the buttons are only visible in the first tab
             conditionalPanel(condition="input.tabs=='Plots'",
-                             h5('Note: Running the app takes a while the first time. Expect 5 minutes of waiting time on average.'),
+                             h5('Note: Running the app takes a while the first time.'),
+                             h5('The graphs are updated based on the search filters.
+                                      Make sure to clear the filters, in the Search tab, if you want to see the results for the entire dataset.'),
                              helpText('Top jobs by number of postings:'),
                              actionButton('action3','Graph 1'),
                              br(),
@@ -31,7 +33,7 @@ shinyUI(fluidPage(
             
             #Add fields to search by and download button to allow exporting search results to csv.
             conditionalPanel(condition="input.tabs=='Search'",
-                             h5('Note: Running the app takes a while the first time. Expect 5 minutes of waiting time on average.'),
+                             h5('Note: Running the app takes a while the first time.'),
                              helpText('Job:'),
                              textInput('j',''),
                              helpText('Company:'),
