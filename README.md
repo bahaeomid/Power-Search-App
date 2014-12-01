@@ -3,7 +3,7 @@
 This app scrapes **Glassdoor** and **Indeed**'s webpages ,searched for a certain job title, and provides a more efficient way to lookup postings from within the app.
 
 ###Requirements
-* RStudio: Click [here](http://www.rstudio.com/products/rstudio/download/) to download.
+* **RStudio**: Click [here](http://www.rstudio.com/products/rstudio/download/) to download
 
 ###Instructions
 * Download/clone the entire app above 
