@@ -3,7 +3,7 @@ packages <- list('XML')
 lapply(packages, function(x) {if(!(x %in% installed.packages())) install.packages(x) else require(x,character.only = TRUE)})
 
 #Define initial links
-glassdoor <- list('http://www.glassdoor.ca/Job/engineer-jobs-SRCH_KO0,8.htm',"http://www.glassdoor.ca/Job/project-controls-jobs-SRCH_KO0,16.htm")
+glassdoor <- list("http://www.glassdoor.ca/Job/engineer-jobs-SRCH_KO0,8.htm","http://www.glassdoor.ca/Job/project-controls-jobs-SRCH_KO0,16.htm")
 indeed <- list("http://ca.indeed.com/jobs?q=engineer","http://ca.indeed.com/jobs?q=project+controls")
 
 #Define a function to generate a full list of links to process later
@@ -43,7 +43,8 @@ for (link in listoflinks) {
     comps <- xpathSApply(doc,"//span[@class='company']/span",xmlValue)
     locs <- xpathSApply(doc,"//span[@class='location']/span",xmlValue)
     dates <- xpathSApply(doc,"//td[@class='snip']//span[@class='date']",xmlValue)
-    Link.Source <- rep('Indeed',length(jobs))
+    Source <- rep('Indeed',length(jobs))
+    url <- xpathSApply(doc,"//h2[@class='jobtitle']/a",function(x) {paste0('http://ca.indeed.com',xmlGetAttr(x,"href"))})
   }
   else {
      fileurl <- readLines(link)  
@@ -52,25 +53,26 @@ for (link in listoflinks) {
      comps <- xpathSApply(doc,"//span[@class='employerName']//tt[@class='i-emp']",xmlValue)
      locs <- xpathSApply(doc,"//span[@itemprop='jobLocation']//tt[@class='i-loc']",xmlValue)
      dates <- xpathSApply(doc,"//div[@class='logo floatLt']//div[@class='minor']",xmlValue)
-     Link.Source <- rep('Glassdoor',length(jobs))
+     Source <- rep('Glassdoor',length(jobs))
+     url <- xpathSApply(doc,"//h3[@itemprop='title']/a[@class='jobLink']",function(x) {paste0('http://www.glassdoor.ca',xmlGetAttr(x,'href'))})
   }
     #handle error
-    possibleError <- tryCatch(rbind(df,data.frame(jobs,comps,locs,dates,Link.Source,stringsAsFactors=FALSE)),error=function(e) e)
+    possibleError <- tryCatch(rbind(df,data.frame(jobs,comps,locs,dates,Source,url,stringsAsFactors=FALSE)),error=function(e) e)
     if(inherits(possibleError, "error")) next
-    else df <- rbind(df,data.frame(jobs,comps,locs,dates,Link.Source,stringsAsFactors=FALSE))
+    else df <- rbind(df,data.frame(jobs,comps,locs,dates,Source,url,stringsAsFactors=FALSE))
 }
 
 #Name the columns of the output dataframe 
-names(df) <- c('Job','Company','Location','Posted.Since.Days.Ago','Link.Source')
+names(df) <- c('Job','Company','Location','Posted','Source','url')
 
 #Convert the date column to numeric
-df[,'Posted.Since.Days.Ago'] <- data.frame(sapply(df[,'Posted.Since.Days.Ago'],function(x) {if ("hours" %in% strsplit(x," ")[[1]]|"hrs" %in% strsplit(x," ")[[1]]) { x <- 1}else{x <-sub('Sponsored',0,x);x <-gsub(' |\\+|[aA-zZ]*','',x);as.numeric(x)}}))
+df[,'Posted'] <- data.frame(sapply(df[,'Posted'],function(x) {if ("hours" %in% strsplit(x," ")[[1]]|"hrs" %in% strsplit(x," ")[[1]]) { x <- 1}else{x <-sub('Sponsored',0,x);x <-gsub(' |\\+|[aA-zZ]*','',x);as.numeric(x)}}))
 
 #Remove the province from location column
 df[,'Location'] <- data.frame(sapply(df[,'Location'], function(x){x <- gsub('\\, .*','',x)}))
 
 #Convert the columns of the output dataframe to appropriate classes
-df[c('Job','Company','Location','Link.Source')] <- data.frame(lapply(c('Job','Company','Location','Link.Source'),function(x) factor(df[,x]))) 
+df[c('Job','Company','Location','Source')] <- data.frame(lapply(c('Job','Company','Location','Source'),function(x) factor(df[,x]))) 
 
 #Remove irrelevant jobs
 removejobs <- list('senior','sr.','electric','sale','civil','water','purchas','superintendent','environm','procur'

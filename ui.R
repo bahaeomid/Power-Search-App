@@ -1,8 +1,7 @@
 shinyUI(fluidPage(
     
     #Display datatable filters on top
-    tags$head(tags$style("tfoot {display: table-header-group;}")),
-        
+    tags$head(tags$style("tfoot {display: table-header-group;}")),        
     
     #Add a title
     h1('Power Search'),
@@ -40,7 +39,7 @@ shinyUI(fluidPage(
                              textInput('c',''),
                              helpText('Location:'),
                              textInput('l',''),
-                             sliderInput('d','Posted Since',min = 0,max = 60,step = 5,value = 60),
+                             sliderInput('d','Posted (days ago)',min = 0,max = 60,step = 5,value = 60),
                              checkboxGroupInput('s','',choices = c('Indeed','Glassdoor'),selected = c('Indeed','Glassdoor')),
                              actionButton('action6','Search!'), 
                              br(),
