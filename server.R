@@ -7,7 +7,7 @@ if(length(NewPackages)>0) install.packages(NewPackages)
 lapply(ListofPackages,require,character.only=TRUE)
 
 #Load source code
-source('C:/Users/Bahae.Omid/Google Drive/My R Case Studies/Shiny Apps/PowerSearch App/jobsearch.R',local=TRUE)
+source('C:/Users/Bahae Omid/Google Drive/My R Case Studies/Shiny Apps/PowerSearch App/jobsearch.R',local=TRUE)
 
 
 shinyServer(function(input,output){
@@ -17,8 +17,8 @@ shinyServer(function(input,output){
       if(length(input$j)>0) {ind <- grep(input$j,df[,'Job'],ignore.case = T); df <- df[ind,] }
       if(length(input$c)>0) {ind <- grep(input$c,df[,'Company'],ignore.case = T); df <- df[ind,]}
       if(length(input$l)>0) {ind <- grep(input$l,df[,'Location'],ignore.case = T); df <- df[ind,]}
-      if(input$d >=0) {ind <- df[,'Posted.Since.Days.Ago']<=input$d ; df <- df[ind,]}
-      if(length(input$s)==1) {ind <- df[,'Link.Source']==input$s; df <- df[ind,]}
+      if(input$d >=0) {ind <- df[,'Posted']<=input$d ; df <- df[ind,]}
+      if(length(input$s)==1) {ind <- df[,'Source']==input$s; df <- df[ind,]}
       else if(is.null(input$s)) {df <- df[0,]}
       df
     })
@@ -104,11 +104,13 @@ shinyServer(function(input,output){
       input$action6 #triggered only when button is pressed
       if(input$action6==0) return() 
       else{isolate({
-        search()      
+        transformed <- transform(search(), Link = paste('<a href = ', shQuote(url), '>', 'Click</a>'))
+        transformed <- transformed[,c(1:3,5,7,4,6)] #Rearrange columns
+        transformed[-7] #Remove last column
       })
       }
     }, option=list(autoWidth=FALSE,pageLength=100,
-                   columnDefs = list(list(sWidth=c("100px")))))
+                   columnDefs = list(list(targets =c(5,6) -1, searchable = FALSE),list(sWidth=c("100px")))))
     
     #Allow user to download the data via downloadhandler
     output$down <- downloadHandler(
