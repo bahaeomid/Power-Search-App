@@ -3,10 +3,18 @@ shinyUI(fluidPage(
     #Display datatable filters on top
     tags$head(tags$style("tfoot {display: table-header-group;}")),        
     
-    #Add a title
+    #Add the app title, logos, and
     h1('Power Search'),
     img(src="indeed.jpg", height = 100, width = 100),
     img(src="glassdoor.png", height = 120, width = 120),
+    
+    #Add required JS libraries
+    tagList(
+      singleton(tags$head(tags$script(src='//cdn.datatables.net/1.10.4/js/jquery.dataTables.min.js',type='text/javascript'))),
+      singleton(tags$head(tags$script(src='//cdn.datatables.net/tabletools/2.2.3/js/dataTables.tableTools.min.js',type='text/javascript'))),
+      singleton(tags$head(tags$link(href='//cdn.datatables.net/tabletools/2.2.3/css/dataTables.tableTools.css',rel='stylesheet',type='text/css'))),
+      singleton(tags$script(HTML("if (window.innerHeight < 400) alert('Screen too small');")))
+    ),
     
     #Use the Sidebar layout
     sidebarLayout(
@@ -38,15 +46,14 @@ shinyUI(fluidPage(
                              helpText('Company:'),
                              selectizeInput('c','',choices=NULL,multiple=T),
                              helpText('Location:'),
-                             textInput('l',''),
+                             selectizeInput('l','',choices=NULL,multiple=T),
                              sliderInput('d','Posted (days ago)',min = 0,max = 60,step = 5,value = 60),
                              checkboxGroupInput('s','',choices = c('Indeed','Glassdoor'),selected = c('Indeed','Glassdoor')),
                              actionButton('action6','Search!'), 
                              br(),
                              br(),
-                             helpText('Click below to download the results of your search:'),
-                             downloadButton('down','Download')
-                                                             
+                             helpText('Click below to download the results of your search:')
+                                               
             )
             
         ),

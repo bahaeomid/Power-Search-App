@@ -88,10 +88,13 @@ else df <- df
 dup <- duplicated(df[,1:3])
 df <- df[!dup,]
 
-#Reset rownames
-row.names(df) <- NULL
-
 #Add a new column to replace the text url with a clickable link and then delete the old url column
 df <- transform(df, Link = paste('<a href = ', shQuote(url), '>', 'Click</a>'))
 df <- df[,c(1:3,5,7,4,6)] #Rearrange columns
 df <- df[-7] #Remove last column
+
+#Order df by Posted column so it shows the latest postings first
+df <- df[order(df['Posted']),]
+
+#Reset rownames
+rownames(df) <- NULL
