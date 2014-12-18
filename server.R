@@ -10,26 +10,37 @@ lapply(ListofPackages,require,character.only=TRUE)
 source('C:/Users/Bahae Omid/Google Drive/My R Case Studies/Shiny Apps/PowerSearch App/jobsearch.R',local=TRUE)
 
 
-shinyServer(function(input,output){
+shinyServer(function(input,output,session){
     
-    #Create a reactive function to deal with inputs of the Search tab
+    #Server side search for the choices argument of selectizeInput in ui.R
+    updateSelectizeInput(session, 'c', choices = as.character(df$Company), server = TRUE)
+    
+    #Create a reactive function to look up the indices correponding to the user's inputs and return the search results by returning the indices found
     search <- reactive({
-      if(length(input$j)>0) {ind <- grep(input$j,df[,'Job'],ignore.case = T); df <- df[ind,] }
-      if(length(input$c)>0) {ind <- grep(input$c,df[,'Company'],ignore.case = T); df <- df[ind,]}
-      if(length(input$l)>0) {ind <- grep(input$l,df[,'Location'],ignore.case = T); df <- df[ind,]}
-      if(input$d >=0) {ind <- df[,'Posted']<=input$d ; df <- df[ind,]}
-      if(length(input$s)==1) {ind <- df[,'Source']==input$s; df <- df[ind,]}
-      else if(is.null(input$s)) {df <- df[0,]}
-      df
+        
+        #Look up the indices according to the user's inputs for job,company, location, days, and source
+        ind.j <- if(input$j=='') NULL else grep(input$j,df[,'Job'],ignore.case = T)
+        ind.c <- {tmp<-lapply(input$c, function(x) {which(df[,'Company']==x)}); Reduce(union,tmp)}
+        ind.l <- if(input$l=='') NULL else grep(input$l,df[,'Location'],ignore.case = T)
+        ind.d <- which(df[,'Posted']<=input$d)
+        ind.s <- {tmp<-lapply(input$s, function(x) {which(df[,'Source']==x)}); Reduce(union,tmp)}
+        
+        #Store all the indices found above in one list
+        ind.all <- list(ind.j,ind.c,ind.l,ind.d,ind.s)
+        
+        #Apply the intersect function recursively to ind.all to find the common indices in all the sublists of ind.all
+        ind <- if(is.null(ind.s)) NULL else{Reduce(intersect,ind.all[!sapply(ind.all,is.null)])}
+        
+        #Return the search results
+        df[ind,] 
     })
-    
+
     #Create a reactive function to generate the data for the 1st graph
     p1 <- reactive({
       t <- table(search()$Location)
       if(max(t)>10) {t <- t[t>10]} else {t <- t[t>1]}
       t <- t[order(t,decreasing = T)]
       data.frame(City=names(t),Postings=t,row.names=NULL)
-      
     })
     
     #Create a reactive function to generate the data for the 2nd graph
@@ -38,7 +49,6 @@ shinyServer(function(input,output){
       if(max(t)>5) {t <- t[t>5]} else {t <- t[t>1]}
       t <- t[order(t,decreasing = T)]
       data.frame(Company=names(t),Postings=t,row.names=NULL)
-      
     })
     
     #Create a reactive function to generate the data for the 3rd graph
@@ -46,8 +56,7 @@ shinyServer(function(input,output){
       t <- table(search()$Job)
       if(max(t)>5) {t <- t[t>5]} else {t <- t[t>1]}
       t <- t[order(t,decreasing = T)]
-      data.frame(Job=names(t),Postings=t,row.names=NULL)
-      
+      data.frame(Job=names(t),Postings=t,row.names=NULL) 
     })
    
     #Send the 1st graph to ui.R
@@ -57,11 +66,7 @@ shinyServer(function(input,output){
         else{isolate({
            g <-ggplot(p1(),aes(x=factor(City,levels=City),y=Postings))
            g+geom_bar(stat='identity')+labs(x=NULL,title='Location by Number of Postings')+
-           theme(text=element_text(face='bold'),axis.text.x=element_text(angle=45,hjust=1),axis.text.y=element_text(angle=45,hjust=1),axis.title.y=element_text(vjust=0.3))
-             
-                                            
-          
-                
+           theme(text=element_text(face='bold'),axis.text.x=element_text(angle=45,hjust=1),axis.text.y=element_text(angle=45,hjust=1),axis.title.y=element_text(vjust=0.3))     
         })
         }
     })
@@ -74,11 +79,7 @@ shinyServer(function(input,output){
       else{isolate({
         g <-ggplot(p2(),aes(x=factor(Company,levels=Company),y=Postings))
         g+geom_bar(stat='identity')+labs(x=NULL,title='Company by Number of Postings')+
-          theme(text=element_text(face='bold'),axis.text.x=element_text(angle=45,hjust=1),axis.text.y=element_text(angle=45,hjust=1),axis.title.y=element_text(vjust=0.3))
-        
-        
-        
-        
+          theme(text=element_text(face='bold'),axis.text.x=element_text(angle=45,hjust=1),axis.text.y=element_text(angle=45,hjust=1),axis.title.y=element_text(vjust=0.3)) 
       })
       }
     })
@@ -91,10 +92,6 @@ shinyServer(function(input,output){
         g <-ggplot(p3(),aes(x=factor(Job,levels=Job),y=Postings))
         g+geom_bar(stat='identity')+labs(x=NULL,title='Job Title by Number of Postings')+
           theme(text=element_text(face='bold'),axis.text.x=element_text(angle=45,hjust=1),axis.text.y=element_text(angle=45,hjust=1),axis.title.y=element_text(vjust=0.3))
-        
-        
-        
-        
       })
       }
     })
@@ -104,9 +101,7 @@ shinyServer(function(input,output){
       input$action6 #triggered only when button is pressed
       if(input$action6==0) return() 
       else{isolate({
-        transformed <- transform(search(), Link = paste('<a href = ', shQuote(url), '>', 'Click</a>'))
-        transformed <- transformed[,c(1:3,5,7,4,6)] #Rearrange columns
-        transformed[-7] #Remove last column
+        search()
       })
       }
     }, option=list(autoWidth=FALSE,pageLength=100,

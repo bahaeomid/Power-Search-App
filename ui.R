@@ -36,7 +36,7 @@ shinyUI(fluidPage(
                              helpText('Job:'),
                              textInput('j',''),
                              helpText('Company:'),
-                             textInput('c',''),
+                             selectizeInput('c','',choices=NULL,multiple=T),
                              helpText('Location:'),
                              textInput('l',''),
                              sliderInput('d','Posted (days ago)',min = 0,max = 60,step = 5,value = 60),

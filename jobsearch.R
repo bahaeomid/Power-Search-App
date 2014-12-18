@@ -90,3 +90,8 @@ df <- df[!dup,]
 
 #Reset rownames
 row.names(df) <- NULL
+
+#Add a new column to replace the text url with a clickable link and then delete the old url column
+df <- transform(df, Link = paste('<a href = ', shQuote(url), '>', 'Click</a>'))
+df <- df[,c(1:3,5,7,4,6)] #Rearrange columns
+df <- df[-7] #Remove last column
