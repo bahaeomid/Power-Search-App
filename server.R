@@ -7,13 +7,14 @@ if(length(NewPackages)>0) install.packages(NewPackages)
 lapply(ListofPackages,require,character.only=TRUE)
 
 #Load source code
-source('C:/Users/Bahae Omid/Google Drive/My R Case Studies/Shiny Apps/PowerSearch App/jobsearch.R',local=TRUE)
+source('C:/Users/Bahae.Omid/Google Drive/My R Case Studies/Shiny Apps/PowerSearch App/jobsearch.R',local=TRUE)
 
 
 shinyServer(function(input,output,session){
     
     #Server side search for the choices argument of selectizeInput in ui.R
     updateSelectizeInput(session, 'c', choices = as.character(df$Company), server = TRUE)
+    updateSelectizeInput(session, 'l', choices = as.character(df$Location), server = TRUE)
     
     #Create a reactive function to look up the indices correponding to the user's inputs and return the search results by returning the indices found
     search <- reactive({
@@ -21,7 +22,7 @@ shinyServer(function(input,output,session){
         #Look up the indices according to the user's inputs for job,company, location, days, and source
         ind.j <- if(input$j=='') NULL else grep(input$j,df[,'Job'],ignore.case = T)
         ind.c <- {tmp<-lapply(input$c, function(x) {which(df[,'Company']==x)}); Reduce(union,tmp)}
-        ind.l <- if(input$l=='') NULL else grep(input$l,df[,'Location'],ignore.case = T)
+        ind.l <- {tmp<-lapply(input$l, function(x) {which(df[,'Location']==x)}); Reduce(union,tmp)}
         ind.d <- which(df[,'Posted']<=input$d)
         ind.s <- {tmp<-lapply(input$s, function(x) {which(df[,'Source']==x)}); Reduce(union,tmp)}
         
@@ -105,14 +106,14 @@ shinyServer(function(input,output,session){
       })
       }
     }, option=list(autoWidth=FALSE,pageLength=100,
-                   columnDefs = list(list(targets =c(5,6) -1, searchable = FALSE),list(sWidth=c("100px")))))
+                   columnDefs = list(list(targets =c(5,6) -1, searchable = FALSE),list(sWidth=c("100px"))),
+                   "dom" = 'T<"clear">lfrtip',
+                   "oTableTools" = list(
+                   "sSwfPath" = "//cdnjs.cloudflare.com/ajax/libs/datatables-tabletools/2.1.5/swf/copy_csv_xls.swf",
+                   "aButtons" = list("copy","print",list("sExtends" = "csv","sButtonText" = "Export","aButtons" = "csv")))
+                   )
     
-    #Allow user to download the data via downloadhandler
-    output$down <- downloadHandler(
-        filename='filtered.csv',
-        content=function(file){write.csv(search(),file,row.names=FALSE)}
     )
-    
-    
+      
     
 })
