@@ -7,7 +7,6 @@ This app scrapes **Glassdoor** and **Indeed**'s webpages ,searched for a certain
 
 ###Instructions
 * Download/clone the entire app above 
-* Once downloaded the app, open up `server.R` in **RStudio** and change the working directory to your local directory
-* You may also alter the web links being scraped by the app in `jobsearch.R` file
+* You may alter the web links being scraped by the app in `jobsearch.R` file
 
-Please note that **Power Search** takes a little while to run at startup.
+Please note that by default **Power Search** scrapes more than 100 pages worth of job postings and hence it takes a little while to run at startup.
