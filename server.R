@@ -7,7 +7,7 @@ if(length(NewPackages)>0) install.packages(NewPackages)
 lapply(ListofPackages,require,character.only=TRUE)
 
 #Load source code
-source('C:/Users/Bahae.Omid/Google Drive/My R Case Studies/Shiny Apps/PowerSearch App/jobsearch.R',local=TRUE)
+source('jobsearch.R',local=TRUE)
 
 
 shinyServer(function(input,output,session){
