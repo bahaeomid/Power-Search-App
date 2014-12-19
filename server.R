@@ -102,7 +102,8 @@ shinyServer(function(input,output,session){
       input$action6 #triggered only when button is pressed
       if(input$action6==0) return() 
       else{isolate({
-        search()
+        search()[order(search()['Posted']),]
+
       })
       }
     }, option=list(autoWidth=FALSE,pageLength=100,

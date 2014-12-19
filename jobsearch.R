@@ -93,8 +93,5 @@ df <- transform(df, Link = paste('<a href = ', shQuote(url), '>', 'Click</a>'))
 df <- df[,c(1:3,5,7,4,6)] #Rearrange columns
 df <- df[-7] #Remove last column
 
-#Order df by Posted column so it shows the latest postings first
-df <- df[order(df['Posted']),]
-
 #Reset rownames
 rownames(df) <- NULL
