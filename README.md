@@ -9,4 +9,4 @@ This app scrapes **Glassdoor** and **Indeed**'s webpages ,searched for a certain
 * Download/clone the entire app above 
 * You may alter the web links being scraped by the app in `jobsearch.R` file
 
-Please note that by default **Power Search** scrapes more than 100 pages worth of job postings and hence it takes a little while to run at startup.
+**Note:** by default **Power Search** fetches more than 100 pages worth of job postings and hence it takes a little while to run at startup.
