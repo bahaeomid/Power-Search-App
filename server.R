@@ -108,7 +108,7 @@ withBootstrap2({
         
       })
       }
-    }, option=list(autoWidth=FALSE,pageLength=100,
+    }, escape=FALSE ,option=list(autoWidth=FALSE,pageLength=100,
                    columnDefs = list(list(targets =c(5,6) -1, searchable = FALSE),list(sWidth=c("100px"))),
                    "dom" = 'T<"clear">lfrtip',
                    "oTableTools" = list(
